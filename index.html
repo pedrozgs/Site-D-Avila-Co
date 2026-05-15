@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Avila Co</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<nav>
+    <div class="logo">
+        <img src="img/logo.png" class="logo-img" alt="Logo">
+        <span>D'Avila Co</span>
+    </div>
+    <ul id="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#produtos">Produtos</a></li>
+        <li><a href="#feed">Feed</a></li>
+    </ul>
+    <div class="nav-buttons" id="auth-buttons">
+        <button class="icon-btn" onclick="openLogin()">👤 Entrar</button>
+        <button class="icon-btn" onclick="openCart()">
+            🛒 <span class="cart-badge" id="cart-count">0</span>
+        </button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <h1 class="hero-title"><span class="blue-text">Moda Plus Size</span><br>com Performance</h1>
+        <p style="margin-bottom: 25px; color: #ccc;">A nova geração da moda esportiva premium.</p>
+        <button class="buy-now-btn" onclick="document.getElementById('produtos').scrollIntoView()">Comprar Agora</button>
+    </div>
+</section>
+
+<section id="produtos">
+    <h2 class="title">🔥 PRODUTOS</h2>
+    <div id="products-container" class="products"></div>
+</section>
+
+<div class="modal" id="sizeModal">
+    <div class="selection-box">
+        <h3 id="modal-product-name">Produto</h3>
+        <p style="color: #888; margin-top: 5px;">Selecione o tamanho:</p>
+        <div class="size-options">
+            <button class="size-btn" onclick="selectSize(this)">P</button>
+            <button class="size-btn" onclick="selectSize(this)">M</button>
+            <button class="size-btn" onclick="selectSize(this)">G</button>
+            <button class="size-btn" onclick="selectSize(this)">GG</button>
+            <button class="size-btn" onclick="selectSize(this)">XG</button>
+        </div>
+        <button class="checkout-btn" onclick="confirmAdd()">Adicionar ao Carrinho</button>
+        <button class="back-btn" onclick="closeSizeModal()" style="margin-top: 10px; background: transparent; color: white;">Cancelar</button>
+    </div>
+</div>
+
+<section id="feed">
+    <h2 class="title">Feed Oficial</h2>
+    <div class="feed-container">
+        <img src="img/feed.png" class="feed" style="width:100%; border-radius:15px;">
+    </div>
+</section>
+
+<div class="cart" id="cart">
+    <button class="back-btn" onclick="openCart()">← Voltar</button>
+    <h2>Seu Carrinho</h2>
+    <div id="cart-items" class="cart-items-list"></div>
+    <div class="total-box">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:20px; font-weight:bold;">
+            <span>Total:</span>
+            <span>R$ <span id="total">0.00</span></span>
+        </div>
+        <button class="checkout-btn">Finalizar Compra</button>
+    </div>
+</div>
+
+<div class="modal" id="loginModal">
+    <div class="login-container">
+        <div class="login-left">
+        </div>
+        <div class="login-right">
+            <button class="back-btn" onclick="closeLogin()">← Voltar</button>
+            <h2>Entrar</h2>
+            <input type="email" id="email" placeholder="E-mail (admin@davila.com)">
+            <input type="password" id="password" placeholder="Senha (123456)">
+            <button class="checkout-btn" onclick="login()">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="profileModal">
+    <div class="profile-content">
+        <h2>Meu Perfil</h2>
+        <div id="user-info" style="margin: 20px 0; line-height: 1.6;"></div>
+        <button class="back-btn" onclick="closeProfile()">Fechar</button>
+        <button class="logout-account-btn" onclick="logout()">Sair da Conta</button>
+    </div>
+</div>
+
+<section id="admin" class="admin-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <h2 class="title" style="margin:0;">Painel Administrativo</h2>
+        <button onclick="location.reload()" style="background:#ff4444; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">Sair do Painel</button>
+    </div>
+    
+    <div class="admin-grid">
+        <div class="admin-card">
+            <h3>Gerenciar Produtos</h3>
+            <input type="text" id="newProdName" placeholder="Nome do Produto">
+            <input type="number" id="newProdPrice" placeholder="Preço">
+            <input type="text" id="newProdImg" placeholder="Link da Imagem">
+            <button onclick="addNewProduct()">Adicionar Produto</button>
+            <div id="admin-product-list" class="admin-list"></div>
+        </div>
+
+        <div class="admin-card">
+            <h3>Equipe</h3>
+            <input type="text" id="workerName" placeholder="Nome">
+            <input type="text" id="workerRole" placeholder="Cargo">
+            <button onclick="addStaff()">Cadastrar Membro</button>
+            <div id="staff-list" class="admin-list"></div>
+        </div>
+
+        <div class="admin-card">
+            <h3>Promoção & Financeiro</h3>
+            <input type="number" id="promoPercent" placeholder="% Desconto Global">
+            <button onclick="applyGlobalPromo()">Aplicar Desconto</button>
+            <div style="margin-top:30px; padding:15px; background:#0a0a0a; border-radius:10px;">
+                <p style="font-size:12px; color:#888;">Ganhos Totais</p>
+                <h2 id="total-profit" style="color: #2f6fff;">R$ 0.00</h2>
+            </div>
+        </div>
+
+        <div class="admin-card" style="grid-column: span 2;">
+            <h3>Relatório de Vendas</h3>
+            <canvas id="salesChart" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <div>
+            <h4>D'Avila Co</h4>
+            <p>Moda plus size de performance.</p>
+        </div>
+        <div>
+            <h4>Contato</h4>
+            <p>📞 (11) 99999-9999</p>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
