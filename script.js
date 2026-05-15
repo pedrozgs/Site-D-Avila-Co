@@ -9,14 +9,14 @@ let selectedSizeLabel = "";
 let produtos = [
     { id: 1, name: "Jaqueta Varsity", price: 499.90, img: "img/produto.png" },
     { id: 2, name: "Moletom Performance", price: 279.90, img: "img/moletom-liso.png" },
-    { id: 3, name: "Calça Moletom Performance", price: 459.90, img: "img/moletom.png" },
+    { id: 3, name: "Calça Moletom Performance", price: 299.90, img: "img/moletom.png" },
     { id: 4, name: "Camiseta Essential", price: 229.90, img: "img/camisa-azul.png" },
     { id: 5, name: "Camiseta Essential", price: 229.90, img: "img/camisa-preta.png" },
     { id: 6, name: "Camiseta Essential", price: 229.90, img: "img/camisa-cinza.png" },  
     { id: 7, name: "Camiseta Essential", price: 229.90, img: "img/camisa-branca.png" },
     { id: 8, name: "Shorts Performance", price: 149.90, img: "img/shorts.png" },
     { id: 8, name: "Tênis Urban Fit", price: 459.90, img: "img/produtos.png" },
-    { id: 8, name: "Boné Fit", price: 459.90, img: "img/bone.png" }
+    { id: 8, name: "Boné Fit", price: 159.90, img: "img/bone.png" }
     
 ];
 
