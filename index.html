@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>D'Avila Co</title>
+    <title>D'Avila Co | Performance Premium</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -19,8 +19,11 @@
         <li><a href="#produtos">Produtos</a></li>
         <li><a href="#feed">Feed</a></li>
     </ul>
-    <div class="nav-buttons" id="auth-buttons">
-        <button class="icon-btn" onclick="openLogin()">👤 Entrar</button>
+    <div class="nav-buttons">
+        <button class="profile-nav-btn" onclick="handleProfileClick()">
+            <img src="img/avatar-cliente.png" id="nav-profile-img" alt="Perfil">
+        </button>
+        
         <button class="icon-btn" onclick="openCart()">
             🛒 <span class="cart-badge" id="cart-count">0</span>
         </button>
@@ -40,19 +43,13 @@
     <div id="products-container" class="products"></div>
 </section>
 
-<div class="modal" id="sizeModal">
+<div class="modal" id="purchaseModal">
     <div class="selection-box">
         <h3 id="modal-product-name">Produto</h3>
-        <p style="color: #888; margin-top: 5px;">Selecione o tamanho:</p>
-        <div class="size-options">
-            <button class="size-btn" onclick="selectSize(this)">P</button>
-            <button class="size-btn" onclick="selectSize(this)">M</button>
-            <button class="size-btn" onclick="selectSize(this)">G</button>
-            <button class="size-btn" onclick="selectSize(this)">GG</button>
-            <button class="size-btn" onclick="selectSize(this)">XG</button>
-        </div>
-        <button class="checkout-btn" onclick="confirmAdd()">Adicionar ao Carrinho</button>
-        <button class="back-btn" onclick="closeSizeModal()" style="margin-top: 10px; background: transparent; color: white;">Cancelar</button>
+        <p class="label-modal">Escolha o Tamanho:</p>
+        <div id="size-options" class="options-grid"></div>
+        <button class="checkout-btn" style="margin-top:20px" onclick="confirmAdd()">Adicionar ao Carrinho</button>
+        <button class="cancel-btn" onclick="closePurchaseModal()">Cancelar</button>
     </div>
 </div>
 
@@ -63,54 +60,69 @@
     </div>
 </section>
 
-<div class="cart" id="cart">
+<div class="side-panel" id="cart">
     <button class="back-btn" onclick="openCart()">← Voltar</button>
     <h2>Seu Carrinho</h2>
-    <div id="cart-items" class="cart-items-list"></div>
+    <div id="cart-items" class="panel-content-area"></div>
     <div class="total-box">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:20px; font-weight:bold;">
+        <div class="price-row">
             <span>Total:</span>
             <span>R$ <span id="total">0.00</span></span>
         </div>
-        <button class="checkout-btn">Finalizar Compra</button>
+        <button class="checkout-btn">Finalizar Comprar</button>
+    </div>
+</div>
+
+<div class="modal" id="notLoggedModal">
+    <div class="selection-box text-center">
+        <h2>Acesso Restrito</h2>
+        <p style="color:#666; margin: 15px 0 25px; font-size:14px;">Você não está conectado a nenhuma conta no momento.</p>
+        <button class="checkout-btn" onclick="openLogin()">Fazer Login</button>
+        <button class="cancel-btn" onclick="closeNotLoggedModal()">Voltar</button>
     </div>
 </div>
 
 <div class="modal" id="loginModal">
-    <div class="login-container">
-        <div class="login-left">
+    <div class="selection-box">
+        <h2>Acessar Conta</h2>
+        <p style="color:#666; font-size:14px; margin-bottom:25px;">Insira suas credenciais abaixo.</p>
+        
+        <div class="input-wrapper">
+            <label class="field-label">E-mail</label>
+            <input type="email" id="email" placeholder="admin@davila.com">
         </div>
-        <div class="login-right">
-            <button class="back-btn" onclick="closeLogin()">← Voltar</button>
-            <h2>Entrar</h2>
-            <input type="email" id="email" placeholder="E-mail (admin@davila.com)">
-            <input type="password" id="password" placeholder="Senha (123456)">
-            <button class="checkout-btn" onclick="login()">Entrar</button>
+        <div class="input-wrapper">
+            <label class="field-label">Senha</label>
+            <input type="password" id="password" placeholder="••••••••">
         </div>
+        
+        <button class="checkout-btn" style="margin-top:10px;" onclick="login()">Entrar</button>
+        <button class="cancel-btn" onclick="closeLogin()">Cancelar</button>
     </div>
 </div>
 
 <div class="modal" id="profileModal">
-    <div class="profile-content">
-        <h2>Meu Perfil</h2>
-        <div id="user-info" style="margin: 20px 0; line-height: 1.6;"></div>
-        <button class="back-btn" onclick="closeProfile()">Fechar</button>
-        <button class="logout-account-btn" onclick="logout()">Sair da Conta</button>
+    <div class="selection-box">
+        <h2>Sua Conta</h2>
+        <div id="profile-pop-content"></div>
+        <button class="cancel-btn" onclick="closeProfileModal()" style="margin-top: 15px;">Voltar</button>
     </div>
 </div>
 
 <section id="admin" class="admin-panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+    <div class="admin-header">
         <h2 class="title" style="margin:0;">Painel Administrativo</h2>
-        <button onclick="location.reload()" style="background:#ff4444; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">Sair do Painel</button>
+        <button class="logout-btn" onclick="location.reload()">Sair do Painel</button>
     </div>
     
     <div class="admin-grid">
         <div class="admin-card">
             <h3>Gerenciar Produtos</h3>
-            <input type="text" id="newProdName" placeholder="Nome do Produto">
+            <input type="text" id="newProdName" placeholder="Nome do Produto (inclua a cor)">
             <input type="number" id="newProdPrice" placeholder="Preço">
-            <input type="text" id="newProdImg" placeholder="Link da Imagem">
+            <input type="text" id="newProdImg" placeholder="Link da Imagem (Opcional)">
+            <p style="font-size:12px; color:#888; margin-bottom:5px;">Tamanhos (separe por vírgula):</p>
+            <input type="text" id="newProdSizes" placeholder="Ex: P, M, G, GG, XG">
             <button onclick="addNewProduct()">Adicionar Produto</button>
             <div id="admin-product-list" class="admin-list"></div>
         </div>
@@ -124,18 +136,41 @@
         </div>
 
         <div class="admin-card">
-            <h3>Promoção & Financeiro</h3>
+            <h3>Promoção</h3>
+            <p style="font-size: 13px; color: #888; margin-bottom: 10px;">
+                Desconto Global Ativo: <strong id="active-promo-badge" style="color: #00ff88;">Nenhum</strong>
+            </p>
             <input type="number" id="promoPercent" placeholder="% Desconto Global">
             <button onclick="applyGlobalPromo()">Aplicar Desconto</button>
-            <div style="margin-top:30px; padding:15px; background:#0a0a0a; border-radius:10px;">
-                <p style="font-size:12px; color:#888;">Ganhos Totais</p>
-                <h2 id="total-profit" style="color: #2f6fff;">R$ 0.00</h2>
+        </div>
+
+        <div class="admin-card">
+            <h3>Financeiro (Ganhos)</h3>
+            <div class="profit-badge">
+                <p>Vendas Totais</p>
+                <h2 id="total-profit">R$ 0.00</h2>
             </div>
         </div>
 
         <div class="admin-card" style="grid-column: span 2;">
             <h3>Relatório de Vendas</h3>
             <canvas id="salesChart" style="max-height: 250px;"></canvas>
+        </div>
+
+        <div class="admin-card" style="grid-column: span 2;">
+            <h3>📦 Controle de Estoque</h3>
+            <div class="stock-container-grid">
+                <div class="stock-box-inner">
+                    <h4>Registrar Entrada</h4>
+                    <select id="stockProductSelect"></select>
+                    <input type="number" id="stockQuantityInput" placeholder="Quantidade a Adicionar" min="1">
+                    <button onclick="addStock()" style="background: #00ff88; color: black;">Atualizar Estoque</button>
+                </div>
+                <div class="stock-box-inner">
+                    <h4>⚠️ Status / Baixo Estoque</h4>
+                    <div id="low-stock-list" class="admin-list" style="max-height: 170px;"></div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -144,7 +179,7 @@
     <div class="footer-content">
         <div>
             <h4>D'Avila Co</h4>
-            <p>Moda plus size de performance.</p>
+            <p>A melhor moda plus size performance.</p>
         </div>
         <div>
             <h4>Contato</h4>
