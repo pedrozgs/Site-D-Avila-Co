@@ -1,102 +1,253 @@
-/* CSS REVISADO E ORGANIZADO */
 *{ margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', Arial, sans-serif; }
 body{ background:#0a0a0a; color:white; scroll-behavior: smooth; overflow-x: hidden; }
 
+/* NAVBAR */
 nav{ display:flex; justify-content:space-between; align-items:center; padding:15px 8%; background:rgba(0,0,0,0.95); position:sticky; top:0; z-index:999; border-bottom: 1px solid #222; }
 .logo{ display:flex; align-items:center; gap:12px; font-size:24px; font-weight:bold; }
 .logo-img{ width:40px; height:40px; border-radius:50%; object-fit:cover; }
-
-nav ul{ display:flex; gap:30px; list-style:none; }
+nav ul{ display:flex; gap:30px; list-style:none; align-items: center; }
 nav a{ color:white; text-decoration:none; font-weight:500; transition: 0.3s; }
 nav a:hover{ color: #2f6fff; }
+.nav-buttons { display: flex; align-items: center; gap: 15px; }
 
-.nav-buttons{ display:flex; gap:15px; }
-.icon-btn{ padding:10px 20px; border:none; background:#1a1a1a; color:white; border-radius:8px; cursor:pointer; font-weight:600; transition: 0.3s; display: flex; align-items:center; gap:8px; }
-.icon-btn:hover { background: #2f6fff; }
-.cart-badge{ background:#ff4444; padding:2px 8px; border-radius:10px; font-size: 12px; }
+/* BOTÃO DE PERFIL */
+.profile-nav-btn { background: none; border: 2px solid #333; width: 38px; height: 38px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.profile-nav-btn:hover { border-color: #2f6fff; }
+.profile-nav-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-/* AJUSTE DOS BOTÕES PEQUENOS (VOLTAR / COMPRAR) */
-.back-btn {
-    width: fit-content;
-    padding: 8px 15px;
-    background: #333;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    margin-bottom: 15px;
-    transition: 0.3s;
-}
-.back-btn:hover { background: #444; }
+/* CARRINHO LATERAL */
+.side-panel { position: fixed; right: -450px; top: 0; width: 400px; height: 100vh; background: #0a0a0a; padding: 30px 25px; transition: 0.4s ease; z-index: 9999; border-left: 1px solid #222; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.7); }
+.side-panel.active { right: 0; border-left-color: #2f6fff; }
+.panel-content-area { flex: 1; overflow-y: auto; margin-top: 20px; margin-bottom: 20px; padding-right: 5px; }
 
-.buy-now-btn { 
-    width: fit-content; 
-    padding: 10px 25px; 
-    background: #2f6fff; 
-    border: none; 
-    border-radius: 5px; 
-    color: white; 
-    font-weight: bold; 
-    cursor: pointer;
-}
+/* BOTÃO VOLTAR */
+.back-btn { align-self: flex-start; background: #161616; border: 1px solid #252525; color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: 0.2s; margin-bottom: 15px; display: inline-flex; align-items: center; justify-content: center; }
+.back-btn:hover { background: #222; border-color: #444; color: #2f6fff; }
 
-/* HERO */
-.hero{ height:80vh; background: linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.8)), url('img/banner.png') center/cover; display:flex; justify-content:center; align-items:center; text-align:center; }
-.hero-title{ font-size:60px; margin-bottom: 10px; }
+.input-wrapper { display: flex; flex-direction: column; margin-bottom: 20px; text-align: left; }
+.field-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #aaa; margin-bottom: 8px; }
+.selection-box input { width: 100%; padding: 14px; background: #050505; border: 1px solid #222; color: white; border-radius: 8px; outline: none; font-size: 14px; transition: 0.3s; }
+.selection-box input:focus { border-color: #2f6fff; }
+
+/* CAIXA DE PERFIL */
+.user-profile-box { text-align: center; padding: 15px 0; margin-top: 15px; }
+.user-profile-box img { width: 85px; height: 85px; border-radius: 50%; border: 3px solid #2f6fff; object-fit: cover; margin-bottom: 15px; }
+.user-profile-box h3 { font-size: 22px; margin-bottom: 5px; color: white; }
+.user-profile-box p { font-size: 14px; color: #777; margin-bottom: 15px; }
+.role-badge { display: inline-block; padding: 5px 14px; background: #2f6fff; color: white; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+.total-box { border-top: 1px solid #222; padding-top: 20px; margin-top: auto; background: #0a0a0a; }
+.price-row { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 20px; font-weight: bold; }
+.checkout-btn { width: 100%; padding: 15px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 15px; }
+.checkout-btn:hover { background: #1e55cc; }
+
+.remove-cart-item { background: none; border: none; color: #ff4444; font-size: 22px; font-weight: bold; cursor: pointer; padding: 0 5px; }
+.cancel-btn { width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: #aaa; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s; font-size: 14px; display: block; text-align: center; }
+.cancel-btn:hover { background: #222; color: #fff; border-color: #ff4444; }
+
+/* PRODUTOS E ETIQUETA DE DESCONTO DIAGONAL */
+.hero{ height: 100vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('img/banner.png') center/cover no-repeat; display:flex; justify-content:center; align-items:center; text-align:center; width: 100%;}
+.hero-title{ font-size:clamp(35px, 8vw, 65px); margin-bottom: 10px; line-height: 1.1; }
 .blue-text{ color:#2f6fff; }
+.buy-now-btn { padding: 12px 30px; background: #2f6fff; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.icon-btn{ padding:10px 18px; border:none; background:#1a1a1a; color:white; border-radius:8px; cursor:pointer; font-weight:600; display: flex; align-items:center; gap:8px; }
+.cart-badge{ background:#ff4444; padding:2px 7px; border-radius:50%; font-size: 11px; }
 
 section{ padding:80px 8%; }
-.title { margin-bottom: 40px; font-size: 28px; border-left: 5px solid #2f6fff; padding-left: 15px; }
-
-/* PRODUTOS */
+.title { margin-bottom: 40px; font-size: 28px; border-left: 5px solid #2f6fff; padding-left: 15px; text-transform: uppercase; }
 .products{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px; }
-.product{ background:#111; border-radius:15px; overflow:hidden; border: 1px solid #222; transition: 0.3s; }
-.product:hover { transform: translateY(-5px); border-color: #2f6fff; }
-.product-image{ width:100%; height:300px; object-fit:cover; background: #1a1a1a; }
+
+/* Container do produto com position relative para segurar a tag de desconto */
+.product{ background:#111; border-radius:15px; overflow:hidden; border: 1px solid #222; transition: 0.3s; position: relative; }
+.product-image{ width:100%; height:320px; object-fit:cover; background: #1a1a1a; }
 .product-info{ padding:20px; }
-.price{ font-size:24px; font-weight:bold; margin: 10px 0; color: #2f6fff; }
+.price{ font-size:22px; font-weight:bold; color: #2f6fff; margin: 10px 0; }
 .add-to-cart-btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #2f6fff; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 .add-to-cart-btn:hover { background: #2f6fff; }
 
+/* ETIQUETA DE DESCONTO VERTICAL/HORIZONTAL (DIAGONAL) */
+.promo-badge-tag { position: absolute; top: 18px; left: -28px; background: #00ff88; color: #000; font-size: 11px; font-weight: 800; padding: 6px 30px; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 10; width: 120px; text-align: center; }
+
 /* MODAIS */
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; justify-content:center; align-items:center; z-index:9999; backdrop-filter: blur(5px); }
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,.85); display:none; justify-content:center; align-items:center; z-index:9999; backdrop-filter: blur(8px); }
 .modal.active{ display:flex; }
+.selection-box { background: #111; padding: 35px; border-radius: 20px; width: 90%; max-width: 450px; border: 1px solid #333; text-align: center; }
+.label-modal { margin: 15px 0 8px; font-size: 14px; color: #888; text-align: left; }
+.options-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; justify-content: center; }
+.opt-btn { padding: 8px 15px; border: 1px solid #444; background: #222; color: white; cursor: pointer; border-radius: 5px; font-size: 13px; }
+.opt-btn.selected { background: #2f6fff; border-color: #fff; font-weight: bold; }
 
-/* LOGIN & PERFIL */
-.login-container{ width:90%; max-width:800px; background:#111; border-radius:20px; overflow:hidden; display:flex; border: 1px solid #333; }
-.login-left { width: 36%; padding: 40px; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('img/logo1.png') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-.login-right{ width:60%; padding:40px; display:flex; flex-direction:column; }
-.login-right input, .admin-card input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #333; background: #0a0a0a; color: white; }
-
-.profile-content { width: 100%; max-width: 400px; background: #111; padding: 30px; border-radius: 15px; text-align: center; border: 1px solid #333; }
-.logout-account-btn { background: #ff4444 !important; margin-top: 20px; width: 100%; padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
-
-/* SELEÇÃO DE PRODUTO */
-.selection-box { background: #111; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; border: 1px solid #2f6fff; text-align: center; }
-.size-options { display: flex; gap: 10px; margin: 20px 0; justify-content: center; }
-.size-btn { padding: 10px 15px; border: 1px solid #444; background: #222; color: white; cursor: pointer; border-radius: 5px; }
-.size-btn.selected { background: #2f6fff; border-color: #fff; }
-
-/* ADMIN PANEL */
-.admin-panel { display:none; background: #0a0a0a; }
-.admin-panel.active { display:block; padding: 60px 8%; }
+/* PAINEL ADMINISTRATIVO */
+.admin-panel { display:none; background: #080808; }
+.admin-panel.active { display:block; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
 .admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:25px; }
 .admin-card { background:#111; padding:25px; border-radius:15px; border: 1px solid #222; }
-.admin-card h3 { margin-bottom: 20px; color: #2f6fff; font-size: 18px; }
-.admin-card button { width: 100%; padding: 12px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-.admin-card button:hover { background: #1e56cc; }
-.admin-list { margin-top: 15px; max-height: 200px; overflow-y: auto; padding-right: 5px; }
-.admin-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #1a1a1a; margin-bottom: 8px; border-radius: 8px; font-size: 14px; }
+.admin-card h3 { color: #2f6fff; margin-bottom: 20px; font-size: 18px; }
+.admin-card input, .admin-card select { width: 100%; padding: 12px; margin-bottom: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; outline: none; }
+.admin-card button { width: 100%; padding: 12px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.admin-list { margin-top: 15px; overflow-y: auto; padding-right: 5px; max-height: 220px; }
+.logout-btn { background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-/* CARRINHO */
-.cart{ position:fixed; right:-450px; top:0; width:400px; height:100vh; background:#0a0a0a; padding:25px; transition:.4s; z-index:9999; border-left: 1px solid #2f6fff; display: flex; flex-direction: column; }
-.cart.active{ right:0; }
-.cart-items-list { flex-grow: 1; overflow-y: auto; margin: 20px 0; }
-.cart-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #222; margin-bottom: 10px; }
-.remove-item { color: #ff4444; cursor: pointer; font-weight: bold; }
-.total-box { padding-top: 20px; border-top: 2px solid #222; }
-.checkout-btn { width: 100%; padding: 15px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+/* REORDENAÇÃO */
+.order-actions { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
+.order-btn { background: #222; border: 1px solid #333; color: #fff; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-size: 11px; transition: 0.2s; }
+.order-btn:hover { background: #2f6fff; border-color: #fff; }
 
-footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-top: 50px; }
-.footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; }
+/* NOVO DESIGN DO BOTÃO "X" DE EXCLUSÃO (ALINHADO E BONITO) */
+.delete-btn-adm { background: #1f1414; border: 1px solid #ff4444; color: #ff4444; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; margin-left: auto; flex-shrink: 0; }
+.delete-btn-adm:hover { background: #ff4444; color: #fff; transform: scale(1.08); box-shadow: 0 0 10px rgba(255, 68, 68, 0.4); }
+
+.stock-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.stock-box-inner { background: #1a1a1a; padding: 15px; border-radius: 10px; }
+.stock-box-inner h4 { margin-bottom: 15px; color: #aaa; font-weight: 500; }
+.stock-item-status { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0a0a0a; margin-bottom: 6px; border-radius: 6px; font-size: 14px; border: 1px solid #222; }
+.badge-low { background: #ff4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+.badge-ok { background: #00ff88; color: black; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+.profit-badge { background: #000; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #222; }
+.profit-badge h2 { color: #00ff88; font-size: 32px; margin-top: 5px; }
+
+footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-top: 50px; text-align: center; color: #666; }
+.footer-content { display: flex; justify-content: space-between; text-align: left; color: white; }
+
+
+/* --- CORREÇÃO DOS BOTÕES DE EXCLUSÃO NO PAINEL --- */
+
+/* Ajusta o container do produto e da equipe para aceitar o botão no canto */
+#admin-product-list > div, 
+#staff-list > div {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding-right: 50px !important; /* Abre espaço para o botão não esmagar o texto */
+    background: #1a1a1a !important;
+    border: 1px solid #252525 !important;
+    border-radius: 8px !important;
+    margin-bottom: 8px !important;
+    height: auto !important;
+}
+
+/* Força o botão X a ser pequeno, redondo e fixo na direita */
+.delete-btn-adm {
+    position: absolute !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important; /* Centraliza verticalmente */
+    
+    /* Tamanho do botão */
+    width: 28px !important;
+    height: 28px !important;
+    
+    /* Estilo visual */
+    background: #2a1414 !important;
+    border: 1px solid #ff4444 !important;
+    color: #ff4444 !important;
+    border-radius: 50% !important; /* Deixa redondo */
+    
+    /* Texto interno (o X) */
+    font-size: 14px !important;
+    font-weight: bold !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    cursor: pointer !important;
+    transition: 0.2s all ease !important;
+    margin: 0 !important;
+}
+
+/* Efeito ao passar o mouse por cima */
+.delete-btn-adm:hover {
+    background: #ff4444 !important;
+    color: #ffffff !important;
+    transform: translateY(-50%) scale(1.1) !important;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5) !important;
+}
+
+/* ==========================================================================
+   CONFIGURAÇÕES EXCLUSIVAS PARA CELULAR (TELAS ATÉ 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    
+    /* 1. Ajuste Geral de Espaçamento */
+    section {
+        padding: 40px 5% !important; /* Diminui as margens laterais para aproveitar a tela */
+    }
+
+    /* 2. Barra de Navegação (Navbar) */
+    nav {
+        padding: 10px 5% !important;
+        flex-wrap: wrap; /* Permite que os elementos se posicionem melhor */
+    }
+    .logo {
+        font-size: 20px !important;
+    }
+    nav ul {
+        display: none !important; /* Oculta links secundários para não amontoar o topo */
+    }
+    .nav-buttons {
+        gap: 8px !important;
+    }
+
+    /* 3. Banner Principal (Hero) */
+    .hero {
+        height: 70vh !important; /* Diminui a altura do banner no celular */
+    }
+    .hero-title {
+        font-size: 28px !important; /* Diminui o tamanho da letra do título */
+        line-height: 1.2;
+    }
+
+    /* 4. Grid de Produtos (Vitrine) */
+    .products {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; /* Exibe 2 produtos por linha */
+        gap: 12px !important; /* Deixa o espaçamento menor e mais justo */
+    }
+    .product-image {
+        height: 200px !important; /* Reduz a altura da foto do produto para caber lado a lado */
+    }
+    .product-info {
+        padding: 12px !important; /* Reduz o espaçamento interno do texto */
+    }
+    .product-info h3 {
+        font-size: 14px !important; /* Letras menores para os nomes dos produtos */
+    }
+    .price {
+        font-size: 16px !important;
+    }
+    .add-to-cart-btn {
+        padding: 8px !important;
+        font-size: 12px !important;
+    }
+
+    /* 5. Carrinho Lateral */
+    .side-panel {
+        width: 100% !important; /* O carrinho passa a ocupar a tela inteira ao abrir */
+        right: -100% !important;
+    }
+    .side-panel.active {
+        right: 0 !important;
+    }
+
+    /* 6. Painel Administrativo */
+    .admin-grid {
+        grid-template-columns: 1fr !important; /* Força os cards a ficarem um abaixo do outro */
+        gap: 15px !important;
+    }
+    .admin-card {
+        grid-column: span 1 !important; /* Garante que nenhum card tente esticar para os lados */
+        padding: 15px !important;
+    }
+    .stock-container-grid {
+        grid-template-columns: 1fr !important; /* Ajusta a área de estoque */
+        gap: 15px !important;
+    }
+
+    /* 7. Rodapé (Footer) */
+    .footer-content {
+        flex-direction: column !important; /* Coloca as informações empilhadas verticalmente */
+        gap: 20px !important;
+        text-align: center !important;
+    }
+}
