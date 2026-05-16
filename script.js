@@ -1,217 +1,344 @@
 let logged = false;
 let isAdmin = false;
-let currentUser = { email: "" };
 let cart = [];
-let totalVendas = 0;
 let selectedProduct = null;
-let selectedSizeLabel = "";
+let selSize = "";
+let currentDiscountPercent = 0; // Armazena a porcentagem atual de desconto ativo
+
+// Objeto base do Usuário do Sistema
+let currentUser = {
+    name: "",
+    email: "",
+    role: "",
+    img: "img/avatar-cliente.png"
+};
 
 let produtos = [
-    { id: 1, name: "Jaqueta Varsity", price: 499.90, img: "img/produto.png" },
-    { id: 2, name: "Moletom Performance", price: 279.90, img: "img/moletom-liso.png" },
-    { id: 3, name: "Calça Moletom Performance", price: 299.90, img: "img/moletom.png" },
-    { id: 4, name: "Camiseta Essential", price: 229.90, img: "img/camisa-azul.png" },
-    { id: 5, name: "Camiseta Essential", price: 229.90, img: "img/camisa-preta.png" },
-    { id: 6, name: "Camiseta Essential", price: 229.90, img: "img/camisa-cinza.png" },  
-    { id: 7, name: "Camiseta Essential", price: 229.90, img: "img/camisa-branca.png" },
-    { id: 8, name: "Shorts Performance", price: 149.90, img: "img/shorts.png" },
-    { id: 8, name: "Tênis Urban Fit", price: 459.90, img: "img/produtos.png" },
-    { id: 8, name: "Boné Fit", price: 159.90, img: "img/bone.png" }
-    
+    { id: 1, name: "Jaqueta Varsity", price: 499.90, img: "img/produto.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 12 },
+    { id: 2, name: "Moletom Performance", price: 279.90, img: "img/moletom-liso.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8 },
+    { id: 3, name: "Calça Moletom Performance", price: 299.90, img: "img/moletom.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8 },
+    { id: 4, name: "Camiseta Essential", price: 229.90, img: "img/camisa-azul.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 9 },
+    { id: 5, name: "Camiseta Essential", price: 229.90, img: "img/camisa-preta.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 12 },
+    { id: 6, name: "Camiseta Essential", price: 229.90, img: "img/camisa-cinza.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8  },  
+    { id: 7, name: "Camiseta Essential", price: 229.90, img: "img/camisa-branca.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 10  },
+    { id: 8, name: "Shorts Performance", price: 149.90, img: "img/shorts.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 4  },
+    { id: 9, name: "Tênis Urban Fit", price: 359.90, img: "img/produtos.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8 },
+    { id: 10, name: "Boné Fit", price: 99.90, img: "img/bone.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8 }
 ];
 
 let equipe = [
-    { name: "Carlos Silveira", role: "Gerente" },
-    { name: "Ana Julia", role: "Vendas" }
+    { id: 1, name: "Carlos Silveira", role: "Gerente" },
+    { id: 2, name: "Ana Beatriz", role: "Supervisor" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
     renderProducts();
     renderStaff();
     initChart();
+    updateNavigation();
 });
 
-// --- LOGIN E NAVEGAÇÃO ---
-function login() {
-    let email = document.getElementById("email").value;
-    let password = document.getElementById("password").value;
-    if(!email || !password) return alert("Preencha os campos!");
-
-    logged = true;
-    currentUser.email = email;
-
-    if (email === "admin@davila.com" && password === "123456") {
-        isAdmin = true;
-        document.getElementById("admin").classList.add("active");
+// --- CONTROLE DOS POP-UPS (MODAIS) ---
+function handleProfileClick() {
+    document.getElementById("cart").classList.remove("active");
+    if (logged) {
+        updateProfileUI();
+        document.getElementById("profileModal").classList.add("active");
+    } else {
+        document.getElementById("notLoggedModal").classList.add("active");
     }
-    updateNavbar();
-    closeLogin();
 }
 
-function logout() {
-    location.reload();
+function closeProfileModal() { document.getElementById("profileModal").classList.remove("active"); }
+function openNotLoggedModal() { document.getElementById("notLoggedModal").classList.add("active"); }
+function closeNotLoggedModal() { document.getElementById("notLoggedModal").classList.remove("active"); }
+function openCart() { document.getElementById("cart").classList.toggle("active"); }
+function openLogin() { closeNotLoggedModal(); document.getElementById("loginModal").classList.add("active"); }
+function closeLogin() { document.getElementById("loginModal").classList.remove("active"); }
+
+// --- LOGICA DE LOGIN ---
+function login() {
+    let emailInput = document.getElementById("email").value.trim();
+    let passwordInput = document.getElementById("password").value.trim();
+
+    if (emailInput === "admin@davila.com" && passwordInput === "123456") {
+        isAdmin = true;
+        logged = true;
+        
+        currentUser.name = "Administrador D'Avila";
+        currentUser.email = "admin@davila.com";
+        currentUser.role = "Administrador";
+        currentUser.img = "img/logo.png"; 
+        
+        let navImg = document.getElementById("nav-profile-img");
+        if (navImg) {
+            navImg.src = currentUser.img;
+        }
+        
+        document.getElementById("admin").classList.add("active");
+        closeLogin(); // Fecha o modal imediatamente
+        alert("Bem-vindo, Administrador!");
+    } else if (emailInput !== "" && passwordInput !== "") {
+        isAdmin = false;
+        logged = true;
+        
+        currentUser.name = "Cliente Premium";
+        currentUser.email = emailInput;
+        currentUser.role = "Cliente";
+        currentUser.img = "img/avatar-cliente.png"; 
+        
+        let navImg = document.getElementById("nav-profile-img");
+        if (navImg) {
+            navImg.src = currentUser.img;
+        }
+        
+        closeLogin(); // Fecha o modal imediatamente
+        alert("Login efetuado com sucesso!");
+    } else {
+        return alert("Preencha as credenciais corretas!");
+    }
+
+    updateNavigation();
 }
 
-function updateNavbar() {
-    const authBox = document.getElementById("auth-buttons");
-    authBox.innerHTML = `
-        <button class="icon-btn" onclick="openProfile()">👤 Perfil</button>
-        <button class="icon-btn" onclick="openCart()">
-            🛒 <span class="cart-badge" id="cart-count">${cart.length}</span>
-        </button>
+function updateNavigation() {
+    const navLinks = document.getElementById("nav-links");
+    if (!navLinks) return;
+    
+    let htmlContent = `
+        <li><a href="#">Home</a></li>
+        <li><a href="#produtos">Produtos</a></li>
+        <li><a href="#feed">Feed</a></li>
+    `;
+    if (logged && isAdmin) {
+        htmlContent += `<li><a href="#admin" style="color: #2f6fff; font-weight: bold;">Painel ADM</a></li>`;
+    }
+    navLinks.innerHTML = htmlContent;
+}
+
+// CORRIGIDO: Mantida apenas uma única versão funcional que sincroniza as imagens
+function updateProfileUI() {
+    const container = document.getElementById("profile-pop-content");
+    if (!container) return;
+
+    let navImg = document.getElementById("nav-profile-img");
+    if (navImg) {
+        navImg.src = currentUser.img;
+    }
+
+    container.innerHTML = `
+        <div class="user-profile-box">
+            <img src="${currentUser.img}" alt="Avatar">
+            <h3>${currentUser.name}</h3>
+            <p>${currentUser.email}</p>
+            <span class="role-badge">${currentUser.role}</span>
+        </div>
+        <button class="checkout-btn" style="background: #ff4444; margin-top:15px;" onclick="location.reload()">Sair da Conta</button>
     `;
 }
 
-// --- MODAIS ---
-function openLogin() { document.getElementById("loginModal").classList.add("active"); }
-function closeLogin() { document.getElementById("loginModal").classList.remove("active"); }
-function openCart() { document.getElementById("cart").classList.toggle("active"); }
-function openProfile() {
-    const info = document.getElementById("user-info");
-    info.innerHTML = `<strong>E-mail:</strong> ${currentUser.email}<br><strong>Status:</strong> ${isAdmin ? "Admin" : "Cliente VIP"}`;
-    document.getElementById("profileModal").classList.add("active");
+// --- CONTROLE DE POSIÇÕES / REORDENAÇÃO ---
+function moveProductUp(index) {
+    if (index === 0) return; 
+    let temp = produtos[index];
+    produtos[index] = produtos[index - 1];
+    produtos[index - 1] = temp;
+    renderProducts();
 }
-function closeProfile() { document.getElementById("profileModal").classList.remove("active"); }
 
-// --- LOGICA DE PRODUTOS ---
+function moveProductDown(index) {
+    if (index === produtos.length - 1) return; 
+    let temp = produtos[index];
+    produtos[index] = produtos[index + 1];
+    produtos[index + 1] = temp;
+    renderProducts();
+}
+
+// --- PRODUTOS E VITRINE ---
 function renderProducts() {
     const container = document.getElementById("products-container");
     const adminList = document.getElementById("admin-product-list");
     if(!container || !adminList) return;
-    
+
     container.innerHTML = ""; adminList.innerHTML = "";
-
     produtos.forEach((p, index) => {
+        let promoBadgeHtml = currentDiscountPercent > 0 ? `<div class="promo-badge-tag">-${currentDiscountPercent}% OFF</div>` : '';
+
         container.innerHTML += `
-            <div class="product">
-                <img src="${p.img}" class="product-image">
-                <div class="product-info">
-                    <h3>${p.name}</h3>
-                    <div class="price">R$ ${p.price.toFixed(2)}</div>
-                    <button class="add-to-cart-btn" onclick="triggerSizeModal(${index})">Adicionar ao Carrinho</button>
-                </div>
-            </div>`;
-
+        <div class="product">
+            ${promoBadgeHtml}
+            <img src="${p.img}" class="product-image">
+            <div class="product-info">
+                <h3>${p.name}</h3>
+                <div class="price">R$ ${p.price.toFixed(2)}</div>
+                <button class="add-to-cart-btn" onclick="triggerPurchaseModal(${index})">Comprar</button>
+            </div>
+        </div>`;
+        
         adminList.innerHTML += `
-            <div class="admin-item">
-                <span>${p.name}</span>
-                <button onclick="removeProduct(${index})" style="background:red; color:white; border:none; border-radius:5px; padding:2px 8px; cursor:pointer;">X</button>
-            </div>`;
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#1a1a1a; margin-bottom:6px; border-radius:8px; font-size:13px; border: 1px solid #252525;">
+            <div style="display:flex; align-items:center;">
+                <div class="order-actions">
+                    <button class="order-btn" onclick="moveProductUp(${index})">▲</button>
+                    <button class="order-btn" onclick="moveProductDown(${index})">▼</button>
+                </div>
+                <span style="font-weight:500; margin-left:5px;">${p.name}</span>
+            </div>
+            <button class="delete-btn-adm" onclick="produtos.splice(${index},1); renderProducts()">×</button>
+        </div>`;
     });
+    renderStockUI();
 }
 
-// SELEÇÃO DE TAMANHO
-function triggerSizeModal(index) {
-    if (!logged) return alert("Por favor, faça login primeiro!");
+function addNewProduct() {
+    let name = document.getElementById("newProdName").value;
+    let price = parseFloat(document.getElementById("newProdPrice").value);
+    let sizes = document.getElementById("newProdSizes").value.split(",").map(i => i.trim());
+    let img = document.getElementById("newProdImg").value || "img/produtos.png";
+
+    if (name && price && sizes[0]) {
+        produtos.push({ id: Date.now(), name, price, img, sizes, stock: 0 });
+        renderProducts();
+        document.getElementById("newProdName").value = "";
+        document.getElementById("newProdPrice").value = "";
+        document.getElementById("newProdSizes").value = "";
+    } else {
+        alert("Preencha os dados do produto corretamente!");
+    }
+}
+
+// --- CONTROLE DE PROMOÇÃO ---
+function applyGlobalPromo() {
+    let inputVal = parseFloat(document.getElementById("promoPercent").value);
+    
+    if(inputVal > 0 && inputVal <= 100) {
+        currentDiscountPercent = inputVal; 
+        let pct = inputVal / 100;
+        
+        produtos.forEach(p => p.price *= (1 - pct));
+        renderProducts();
+        
+        let badge = document.getElementById("active-promo-badge");
+        if (badge) {
+            badge.innerText = `${currentDiscountPercent}% Ativo`;
+        }
+        document.getElementById("promoPercent").value = "";
+        alert(`Desconto global de ${currentDiscountPercent}% aplicado com sucesso!`);
+    } else {
+        alert("Insira uma porcentagem válida entre 1 e 100!");
+    }
+}
+
+// --- COMPRA E ESTOQUE ---
+function triggerPurchaseModal(index) {
     selectedProduct = produtos[index];
+    selSize = "";
     document.getElementById("modal-product-name").innerText = selectedProduct.name;
-    document.getElementById("sizeModal").classList.add("active");
-    selectedSizeLabel = "";
-    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+    const sizeCont = document.getElementById("size-options");
+    sizeCont.innerHTML = "";
+    selectedProduct.sizes.forEach(s => {
+        sizeCont.innerHTML += `<button class="opt-btn" onclick="selectSizeOpt(this)">${s}</button>`;
+    });
+    document.getElementById("purchaseModal").classList.add("active");
 }
 
-function selectSize(btn) {
-    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+function selectSizeOpt(btn) {
+    btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
-    selectedSizeLabel = btn.innerText;
+    selSize = btn.innerText;
 }
+
+function closePurchaseModal() { document.getElementById("purchaseModal").classList.remove("active"); }
 
 function confirmAdd() {
-    if(!selectedSizeLabel) return alert("Selecione um tamanho!");
-    addToCart(selectedProduct.name, selectedProduct.price, selectedSizeLabel);
-    closeSizeModal();
-}
+    if(!selSize) return alert("Selecione um tamanho!");
+    if(selectedProduct.stock <= 0) return alert("Produto sem estoque disponível!");
 
-function closeSizeModal() { document.getElementById("sizeModal").classList.remove("active"); }
-
-// CARRINHO
-function addToCart(name, price, size) {
-    cart.push({ name, price, size });
+    cart.push({ cartId: Date.now(), id: selectedProduct.id, name: selectedProduct.name, price: selectedProduct.price, size: selSize });
+    selectedProduct.stock--; 
     updateCartUI();
+    renderProducts();
+    closePurchaseModal();
 }
 
 function updateCartUI() {
     const cartList = document.getElementById("cart-items");
-    cartList.innerHTML = "";
-    let total = 0;
-
-    cart.forEach((item, index) => {
+    cartList.innerHTML = ""; let total = 0;
+    cart.forEach(item => {
         total += item.price;
         cartList.innerHTML += `
-            <div class="cart-item">
-                <div>
-                    <strong>${item.name}</strong><br>
-                    <small>Tam: ${item.size}</small>
-                </div>
-                <div>
-                    R$ ${item.price.toFixed(2)} 
-                    <span class="remove-item" onclick="removeFromCart(${index})"> [X]</span>
-                </div>
-            </div>`;
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #222;">
+            <div><strong>${item.name}</strong><br><small style="color:#888;">Tam: ${item.size}</small></div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-weight:600;">R$ ${item.price.toFixed(2)}</span>
+                <button class="remove-cart-item" onclick="removeFromCart(${item.cartId})">×</button>
+            </div>
+        </div>`;
     });
-
     document.getElementById("total").innerText = total.toFixed(2);
     document.getElementById("cart-count").innerText = cart.length;
-    document.getElementById("total-profit").innerText = "R$ " + total.toFixed(2);
+    
+    let totalProfit = document.getElementById("total-profit");
+    if (totalProfit) {
+        totalProfit.innerText = "R$ " + total.toFixed(2);
+    }
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartUI();
-}
-
-// --- ADMIN ---
-function addNewProduct() {
-    let name = document.getElementById("newProdName").value;
-    let price = parseFloat(document.getElementById("newProdPrice").value);
-    let img = document.getElementById("newProdImg").value || "img/produtos.png";
-    if (name && price) {
-        produtos.push({ id: Date.now(), name, price, img });
+function removeFromCart(cartId) {
+    const idx = cart.findIndex(i => i.cartId === cartId);
+    if(idx > -1) {
+        const prod = produtos.find(p => p.id === cart[idx].id);
+        if(prod) prod.stock++;
+        cart.splice(idx, 1);
+        updateCartUI();
         renderProducts();
     }
 }
 
-function removeProduct(index) { produtos.splice(index, 1); renderProducts(); }
+function renderStockUI() {
+    const select = document.getElementById("stockProductSelect");
+    const lowStockList = document.getElementById("low-stock-list");
+    if(!select || !lowStockList) return;
+    select.innerHTML = ""; lowStockList.innerHTML = "";
+    produtos.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.name} (Atual: ${p.stock} un)</option>`;
+        let status = p.stock <= 4 ? `<span class="badge-low">Crítico: ${p.stock} un</span>` : `<span class="badge-ok">${p.stock} un</span>`;
+        lowStockList.innerHTML += `<div class="stock-item-status"><span>${p.name}</span>${status}</div>`;
+    });
+}
+
+function addStock() {
+    const pId = document.getElementById("stockProductSelect").value;
+    const qty = parseInt(document.getElementById("stockQuantityInput").value);
+    if(!qty || qty <= 0) return alert("Quantidade inválida!");
+    const prod = produtos.find(p => p.id == pId);
+    if(prod) { prod.stock += qty; renderProducts(); document.getElementById("stockQuantityInput").value = ""; }
+}
+
+// --- EQUIPE ---
+function addStaff() {
+    let n = document.getElementById("workerName").value.trim();
+    let r = document.getElementById("workerRole").value.trim();
+    if(n && r) { equipe.push({ id: Date.now(), name: n, role: r }); renderStaff(); document.getElementById("workerName").value=""; document.getElementById("workerRole").value=""; }
+}
 
 function renderStaff() {
     const list = document.getElementById("staff-list");
-    if(!list) return;
-    list.innerHTML = "";
-    equipe.forEach((m, index) => {
+    if(!list) return; list.innerHTML = "";
+    equipe.forEach(m => {
         list.innerHTML += `
-            <div class="admin-item">
-                <span>${m.name} (${m.role})</span>
-                <button onclick="removeStaff(${index})" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Remover</button>
-            </div>`;
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#1a1a1a; margin-bottom:6px; border-radius:8px; font-size:13px; border: 1px solid #252525;">
+            <div><strong style="color:#fff;">${m.name}</strong> - <small style="color:#aaa;">${m.role}</small></div>
+            <button class="delete-btn-adm" onclick="equipe=equipe.filter(e=>e.id!=${m.id}); renderStaff()">×</button>
+        </div>`;
     });
 }
 
-function addStaff() {
-    let name = document.getElementById("workerName").value;
-    let role = document.getElementById("workerRole").value;
-    if (name && role) { equipe.push({ name, role }); renderStaff(); }
-}
-function removeStaff(index) { equipe.splice(index, 1); renderStaff(); }
-
-function applyGlobalPromo() {
-    let pct = document.getElementById("promoPercent").value / 100;
-    if(pct > 0) {
-        produtos.forEach(p => p.price = p.price * (1 - pct));
-        renderProducts();
-        alert("Desconto aplicado!");
-    }
-}
-
-// GRAFICO
 function initChart() {
-    const ctx = document.getElementById('salesChart');
-    if(!ctx) return;
+    const ctx = document.getElementById('salesChart'); if(!ctx) return;
     new Chart(ctx.getContext('2d'), {
         type: 'line',
-        data: { 
-            labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], 
-            datasets: [{ label: 'Vendas', data: [12, 19, 3, 5, 2], borderColor: '#2f6fff', tension: 0.4 }] 
-        },
-        options: { plugins: { legend: { display: false } } }
+        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Vendas (R$)', data: [500, 1200, 800, 1500, 2100], borderColor: '#2f6fff', tension: 0.4 }] },
+        options: { plugins: { legend: { labels: { color: '#fff' } } } }
     });
 }
