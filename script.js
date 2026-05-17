@@ -5,7 +5,12 @@ let selectedProduct = null;
 let selSize = "";
 let currentDiscountPercent = 0; // Armazena a porcentagem atual de desconto ativo
 
-// Objeto base do Usuário do Sistema
+// Lista de usuários cadastrados (O admin já começa cadastrado aqui)
+let usuariosCadastrados = [
+    { name: "Administrador D'Avila", email: "admin@davila.com", password: "123456", role: "Administrador", img: "img/logo.png" }
+];
+
+// Objeto base do Usuário do Sistema Logado
 let currentUser = {
     name: "",
     email: "",
@@ -53,52 +58,110 @@ function closeProfileModal() { document.getElementById("profileModal").classList
 function openNotLoggedModal() { document.getElementById("notLoggedModal").classList.add("active"); }
 function closeNotLoggedModal() { document.getElementById("notLoggedModal").classList.remove("active"); }
 function openCart() { document.getElementById("cart").classList.toggle("active"); }
-function openLogin() { closeNotLoggedModal(); document.getElementById("loginModal").classList.add("active"); }
-function closeLogin() { document.getElementById("loginModal").classList.remove("active"); }
 
-// --- LOGICA DE LOGIN ---
+// Altera a abertura do login para sempre resetar na tela de login
+function openLogin() { 
+    closeNotLoggedModal(); 
+    toggleAuthMode('login');
+    document.getElementById("loginModal").classList.add("active"); 
+}
+
+function closeLogin() { 
+    document.getElementById("loginModal").classList.remove("active"); 
+}
+
+// Função para alternar visualmente entre o formulário de Login e o de Cadastro
+function toggleAuthMode(mode) {
+    const loginArea = document.getElementById("login-form-area");
+    const registerArea = document.getElementById("register-form-area");
+    
+    if (mode === 'register') {
+        loginArea.style.display = "none";
+        registerArea.style.display = "block";
+    } else {
+        loginArea.style.display = "block";
+        registerArea.style.display = "none";
+    }
+}
+
+// --- FUNÇÃO DE CADASTRO DE NOVO USUÁRIO ---
+function registerUser() {
+    let name = document.getElementById("reg-name").value.trim();
+    let email = document.getElementById("reg-email").value.trim();
+    let password = document.getElementById("reg-password").value.trim();
+
+    if (!name || !email || !password) {
+        return alert("Por favor, preencha todos os campos para se cadastrar!");
+    }
+
+    // Verifica se o e-mail já foi usado
+    let emailExiste = usuariosCadastrados.some(user => user.email === email);
+    if (emailExiste) {
+        return alert("Este e-mail já está cadastrado!");
+    }
+
+    // Adiciona o novo cliente na lista do sistema
+    usuariosCadastrados.push({
+        name: name,
+        email: email,
+        password: password,
+        role: "Cliente",
+        img: "img/avatar-cliente.png"
+    });
+
+    alert("Cadastro realizado com sucesso! Agora você pode fazer o seu login.");
+    
+    // Limpa os campos do cadastro
+    document.getElementById("reg-name").value = "";
+    document.getElementById("reg-email").value = "";
+    document.getElementById("reg-password").value = "";
+    
+    // Volta para a tela de login automaticamente
+    toggleAuthMode('login');
+}
+
+// --- FUNÇÃO DE LOGIN ATUALIZADA (Busca na lista dinâmica) ---
 function login() {
     let emailInput = document.getElementById("email").value.trim();
     let passwordInput = document.getElementById("password").value.trim();
 
-    if (emailInput === "admin@davila.com" && passwordInput === "123456") {
-        isAdmin = true;
-        logged = true;
-        
-        currentUser.name = "Administrador D'Avila";
-        currentUser.email = "admin@davila.com";
-        currentUser.role = "Administrador";
-        currentUser.img = "img/logo.png"; 
-        
-        let navImg = document.getElementById("nav-profile-img");
-        if (navImg) {
-            navImg.src = currentUser.img;
-        }
-        
-        document.getElementById("admin").classList.add("active");
-        closeLogin(); // Fecha o modal imediatamente
-        alert("Bem-vindo, Administrador!");
-    } else if (emailInput !== "" && passwordInput !== "") {
-        isAdmin = false;
-        logged = true;
-        
-        currentUser.name = "Cliente Premium";
-        currentUser.email = emailInput;
-        currentUser.role = "Cliente";
-        currentUser.img = "img/avatar-cliente.png"; 
-        
-        let navImg = document.getElementById("nav-profile-img");
-        if (navImg) {
-            navImg.src = currentUser.img;
-        }
-        
-        closeLogin(); // Fecha o modal imediatamente
-        alert("Login efetuado com sucesso!");
-    } else {
-        return alert("Preencha as credenciais corretas!");
-    }
+    // Procura o usuário digitado dentro da nossa lista do sistema
+    let usuarioEncontrado = usuariosCadastrados.find(user => user.email === emailInput && user.password === passwordInput);
 
-    updateNavigation();
+    if (usuarioEncontrado) {
+        logged = true;
+        isAdmin = (usuarioEncontrado.role === "Administrador");
+
+        // Passa as informações encontradas para o perfil logado
+        currentUser.name = usuarioEncontrado.name;
+        currentUser.email = usuarioEncontrado.email;
+        currentUser.role = usuarioEncontrado.role;
+        currentUser.img = usuarioEncontrado.img;
+
+        // Atualiza a foto da Nav Bar se ela existir
+        let navImg = document.getElementById("nav-profile-img");
+        if (navImg) {
+            navImg.src = currentUser.img;
+        }
+
+        // Se for admin, ativa as permissões visuais do painel
+        if (isAdmin) {
+            document.getElementById("admin").classList.add("active");
+            closeLogin();
+            alert(`Bem-vindo, ${currentUser.name}!`);
+        } else {
+            closeLogin();
+            alert(`Login efetuado com sucesso! Bem-vindo(a), ${currentUser.name}.`);
+        }
+
+        // Limpa os campos do login
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+
+        updateNavigation();
+    } else {
+        alert("E-mail ou senha incorretos!");
+    }
 }
 
 function updateNavigation() {
@@ -116,7 +179,6 @@ function updateNavigation() {
     navLinks.innerHTML = htmlContent;
 }
 
-// CORRIGIDO: Mantida apenas uma única versão funcional que sincroniza as imagens
 function updateProfileUI() {
     const container = document.getElementById("profile-pop-content");
     if (!container) return;
