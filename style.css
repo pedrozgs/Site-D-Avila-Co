@@ -57,7 +57,7 @@ section{ padding:80px 8%; }
 .title { margin-bottom: 40px; font-size: 28px; border-left: 5px solid #2f6fff; padding-left: 15px; text-transform: uppercase; }
 .products{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px; }
 
-/* Container do produto com position relative para segurar a tag de desconto */
+/* Container do produto */
 .product{ background:#111; border-radius:15px; overflow:hidden; border: 1px solid #222; transition: 0.3s; position: relative; }
 .product-image{ width:100%; height:320px; object-fit:cover; background: #1a1a1a; }
 .product-info{ padding:20px; }
@@ -65,7 +65,7 @@ section{ padding:80px 8%; }
 .add-to-cart-btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #2f6fff; color: white; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
 .add-to-cart-btn:hover { background: #2f6fff; }
 
-/* ETIQUETA DE DESCONTO VERTICAL/HORIZONTAL (DIAGONAL) */
+/* ETIQUETA DE DESCONTO */
 .promo-badge-tag { position: absolute; top: 18px; left: -28px; background: #00ff88; color: #000; font-size: 11px; font-weight: 800; padding: 6px 30px; transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(0,0,0,0.4); text-transform: uppercase; letter-spacing: 1px; z-index: 10; width: 120px; text-align: center; }
 
 /* MODAIS */
@@ -77,28 +77,12 @@ section{ padding:80px 8%; }
 .opt-btn { padding: 8px 15px; border: 1px solid #444; background: #222; color: white; cursor: pointer; border-radius: 5px; font-size: 13px; }
 .opt-btn.selected { background: #2f6fff; border-color: #fff; font-weight: bold; }
 
-/* PAINEL ADMINISTRATIVO */
-.admin-panel { display:none; background: #080808; }
-.admin-panel.active { display:block; }
-.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-.admin-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:25px; }
-.admin-card { background:#111; padding:25px; border-radius:15px; border: 1px solid #222; }
-.admin-card h3 { color: #2f6fff; margin-bottom: 20px; font-size: 18px; }
-.admin-card input, .admin-card select { width: 100%; padding: 12px; margin-bottom: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; outline: none; }
-.admin-card button { width: 100%; padding: 12px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
-.admin-list { margin-top: 15px; overflow-y: auto; padding-right: 5px; max-height: 220px; }
-.logout-btn { background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-
 /* REORDENAÇÃO */
 .order-actions { display: flex; align-items: center; gap: 4px; margin-right: 10px; }
 .order-btn { background: #222; border: 1px solid #333; color: #fff; width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; font-size: 11px; transition: 0.2s; }
 .order-btn:hover { background: #2f6fff; border-color: #fff; }
 
-/* NOVO DESIGN DO BOTÃO "X" DE EXCLUSÃO (ALINHADO E BONITO) */
-.delete-btn-adm { background: #1f1414; border: 1px solid #ff4444; color: #ff4444; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; margin-left: auto; flex-shrink: 0; }
-.delete-btn-adm:hover { background: #ff4444; color: #fff; transform: scale(1.08); box-shadow: 0 0 10px rgba(255, 68, 68, 0.4); }
-
-.stock-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+/* ELEMENTOS DO ESTOQUE */
 .stock-box-inner { background: #1a1a1a; padding: 15px; border-radius: 10px; }
 .stock-box-inner h4 { margin-bottom: 15px; color: #aaa; font-weight: 500; }
 .stock-item-status { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #0a0a0a; margin-bottom: 6px; border-radius: 6px; font-size: 14px; border: 1px solid #222; }
@@ -111,16 +95,80 @@ footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-
 .footer-content { display: flex; justify-content: space-between; text-align: left; color: white; }
 
 
-/* --- CORREÇÃO DOS BOTÕES DE EXCLUSÃO NO PAINEL --- */
+/* ==========================================================================
+   ESTILIZAÇÃO UNIFICADA E TRAVADA DO PAINEL ADMINISTRATIVO E FEED
+   ========================================================================== */
 
-/* Ajusta o container do produto e da equipe para aceitar o botão no canto */
+/* 1. Feed do Instagram amplo */
+#feed {
+    width: 100% !important;
+    padding: 60px 4% !important;
+}
+.feed-container {
+    width: 100% !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+}
+.feed {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+}
+
+/* 2. Configuração estrutural do Painel (Compacto e Centralizado como nas fotos) */
+.admin-panel {
+    display: none;
+    background: #080808;
+    max-width: 1200px !important; /* Limita o tamanho para não esticar no monitor */
+    margin: 0 auto !important;
+    padding: 50px 20px !important;
+    box-sizing: border-box !important;
+}
+.admin-panel.active { 
+    display: block !important; 
+}
+.admin-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 40px; 
+}
+
+/* 3. Grid rígido de 3 colunas para manter alinhamento perfeito */
+.admin-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 25px !important;
+    width: 100% !important;
+}
+.admin-card { 
+    background: #111 !important; 
+    padding: 25px !important; 
+    border-radius: 15px !important; 
+    border: 1px solid #222 !important; 
+}
+.admin-card h3 { color: #2f6fff; margin-bottom: 20px; font-size: 18px; }
+.admin-card input, .admin-card select { width: 100% !important; padding: 12px; margin-bottom: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 8px; outline: none; box-sizing: border-box !important; }
+.admin-card button { width: 100% !important; padding: 12px; background: #2f6fff; border: none; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; }
+.admin-list { margin-top: 15px; overflow-y: auto; padding-right: 5px; max-height: 220px; }
+.logout-btn { background: #ff4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+/* 4. Alinhamento interno do Bloco de Estoque em 2 Colunas */
+.stock-container-grid { 
+    display: grid !important; 
+    grid-template-columns: 1fr 1fr !important; 
+    gap: 20px !important; 
+    width: 100% !important;
+}
+
+/* 5. Correção Cirúrgica das Listas e do Botão Redondo "X" */
 #admin-product-list > div, 
 #staff-list > div {
     position: relative !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding-right: 50px !important; /* Abre espaço para o botão não esmagar o texto */
+    padding: 10px 50px 10px 12px !important; /* Espaço para o botão no canto direito */
     background: #1a1a1a !important;
     border: 1px solid #252525 !important;
     border-radius: 8px !important;
@@ -128,36 +176,29 @@ footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-
     height: auto !important;
 }
 
-/* Força o botão X a ser pequeno, redondo e fixo na direita */
 .delete-btn-adm {
     position: absolute !important;
     right: 12px !important;
     top: 50% !important;
-    transform: translateY(-50%) !important; /* Centraliza verticalmente */
-    
-    /* Tamanho do botão */
-    width: 28px !important;
-    height: 28px !important;
-    
-    /* Estilo visual */
+    transform: translateY(-50%) !important;
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    max-width: 26px !important;
     background: #2a1414 !important;
     border: 1px solid #ff4444 !important;
     color: #ff4444 !important;
-    border-radius: 50% !important; /* Deixa redondo */
-    
-    /* Texto interno (o X) */
+    border-radius: 50% !important;
     font-size: 14px !important;
     font-weight: bold !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    
     cursor: pointer !important;
-    transition: 0.2s all ease !important;
     margin: 0 !important;
+    padding: 0 !important;
+    transition: 0.2s all ease !important;
 }
-
-/* Efeito ao passar o mouse por cima */
 .delete-btn-adm:hover {
     background: #ff4444 !important;
     color: #ffffff !important;
@@ -165,53 +206,46 @@ footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-
     box-shadow: 0 0 8px rgba(255, 68, 68, 0.5) !important;
 }
 
+
 /* ==========================================================================
    CONFIGURAÇÕES EXCLUSIVAS PARA CELULAR (TELAS ATÉ 768px)
    ========================================================================== */
 @media (max-width: 768px) {
-    
-    /* 1. Ajuste Geral de Espaçamento */
     section {
-        padding: 40px 5% !important; /* Diminui as margens laterais para aproveitar a tela */
+        padding: 40px 5% !important;
     }
-
-    /* 2. Barra de Navegação (Navbar) */
     nav {
         padding: 10px 5% !important;
-        flex-wrap: wrap; /* Permite que os elementos se posicionem melhor */
+        flex-wrap: wrap;
     }
     .logo {
         font-size: 20px !important;
     }
     nav ul {
-        display: none !important; /* Oculta links secundários para não amontoar o topo */
+        display: none !important;
     }
     .nav-buttons {
         gap: 8px !important;
     }
-
-    /* 3. Banner Principal (Hero) */
     .hero {
-        height: 70vh !important; /* Diminui a altura do banner no celular */
+        height: 70vh !important;
     }
     .hero-title {
-        font-size: 28px !important; /* Diminui o tamanho da letra do título */
+        font-size: 28px !important;
         line-height: 1.2;
     }
-
-    /* 4. Grid de Produtos (Vitrine) */
     .products {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; /* Exibe 2 produtos por linha */
-        gap: 12px !important; /* Deixa o espaçamento menor e mais justo */
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 12px !important;
     }
     .product-image {
-        height: 200px !important; /* Reduz a altura da foto do produto para caber lado a lado */
+        height: 200px !important;
     }
     .product-info {
-        padding: 12px !important; /* Reduz o espaçamento interno do texto */
+        padding: 12px !important;
     }
     .product-info h3 {
-        font-size: 14px !important; /* Letras menores para os nomes dos produtos */
+        font-size: 14px !important;
     }
     .price {
         font-size: 16px !important;
@@ -220,33 +254,29 @@ footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-
         padding: 8px !important;
         font-size: 12px !important;
     }
-
-    /* 5. Carrinho Lateral */
     .side-panel {
-        width: 100% !important; /* O carrinho passa a ocupar a tela inteira ao abrir */
+        width: 100% !important;
         right: -100% !important;
     }
     .side-panel.active {
         right: 0 !important;
     }
-
-    /* 6. Painel Administrativo */
+    
+    /* Organização de colunas para telas pequenas */
     .admin-grid {
-        grid-template-columns: 1fr !important; /* Força os cards a ficarem um abaixo do outro */
+        grid-template-columns: 1fr !important;
         gap: 15px !important;
     }
     .admin-card {
-        grid-column: span 1 !important; /* Garante que nenhum card tente esticar para os lados */
+        grid-column: span 1 !important;
         padding: 15px !important;
     }
     .stock-container-grid {
-        grid-template-columns: 1fr !important; /* Ajusta a área de estoque */
+        grid-template-columns: 1fr !important;
         gap: 15px !important;
     }
-
-    /* 7. Rodapé (Footer) */
     .footer-content {
-        flex-direction: column !important; /* Coloca as informações empilhadas verticalmente */
+        flex-direction: column !important;
         gap: 20px !important;
         text-align: center !important;
     }
