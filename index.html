@@ -5,118 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D'Avila - Moda Plus Size com Performance</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <nav>
-        <div class="logo">
-            <img src="img/logo.png" class="logo-img" alt="Logo D'Avila">
-            <span>D'Avila</span>
-        </div>
-        <ul id="nav-links">
-            </ul>
-        <div class="nav-buttons">
-            <button class="icon-btn" onclick="openCart()">
-                🛒 Carrinho <span class="cart-badge" id="cart-count">0</span>
-            </button>
-            <button class="profile-nav-btn" onclick="handleProfileClick()">
-                <img src="img/avatar-cliente.png" id="nav-profile-img" alt="Perfil">
-            </button>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">Moda <span class="blue-text">Plus Size</span><br>com Performance</h1>
-            <p style="margin-bottom: 25px; color: #aaa; font-size: 18px;">Estilo, conforto e alta qualidade moldados para você.</p>
-            <button class="buy-now-btn" onclick="window.location.href='#produtos'">Ver Coleção</button>
-        </div>
-    </header>
-
-    <section id="produtos">
-        <h2 class="title">Nossos Produtos</h2>
-        <div class="products" id="products-container">
+    <div id="site-view">
+        <nav>
+            <div class="logo">
+                <img src="img/logo.png" class="logo-img" alt="Logo D'Avila">
+                <span>D'Avila</span>
             </div>
-    </section>
-
-    <section id="feed">
-        <h2 class="title">@davila.store</h2>
-        <p style="margin-bottom: 30px; color: #888;">Siga nossa jornada no Instagram e marque a gente nos seus looks!</p>
-        <div class="feed-container">
-            <img src="img/feed.png" class="feed" alt="Feed Instagram">
-        </div>
-    </section>
-
-    <section id="admin" class="admin-panel">
-        <div class="admin-header">
-            <h2 class="title" style="margin-bottom: 0;">Painel de Controle Administrador</h2>
-            <button class="logout-btn" onclick="location.reload()">Sair do Painel</button>
-        </div>
-
-        <div class="admin-grid">
-            
-            <div class="admin-card">
-                <h3>Gerenciar Produtos</h3>
-                <input type="text" id="newProdName" placeholder="Nome do Produto (inclua a cor)">
-                <input type="number" id="newProdPrice" placeholder="Preço" step="0.01">
-                <input type="text" id="newProdImg" placeholder="Link da Imagem (Opcional)">
-                <label class="field-label" style="display:block; margin: 10px 0 5px; font-size:12px; color:#aaa;">Tamanhos (separe por vírgula):</label>
-                <input type="text" id="newProdSizes" placeholder="Ex: P, M, G, GG, XG">
-                <button onclick="addNewProduct()">Adicionar Produto</button>
-                <div class="admin-list" id="admin-product-list" style="margin-top: 15px;"></div>
+            <ul id="nav-links"></ul>
+            <div class="nav-buttons">
+                <button class="icon-btn" onclick="openCart()">
+                    🛒 Carrinho <span class="cart-badge" id="cart-count">0</span>
+                </button>
+                <button class="profile-nav-btn" onclick="handleProfileClick()">
+                    <img src="img/avatar-cliente.png" id="nav-profile-img" alt="Perfil">
+                </button>
             </div>
+        </nav>
 
-            <div class="admin-card">
-                <h3>Equipe</h3>
-                <input type="text" id="workerName" placeholder="Nome">
-                <input type="text" id="workerRole" placeholder="Cargo">
-                <button onclick="addStaff()">Cadastrar Membro</button>
-                <div class="admin-list" id="staff-list" style="margin-top: 15px;"></div>
+        <header class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Moda <span class="blue-text">Plus Size</span><br>com Performance</h1>
+                <p style="margin-bottom: 25px; color: #aaa; font-size: 18px;">Estilo, conforto e alta qualidade moldados para você.</p>
+                <button class="buy-now-btn" onclick="window.location.href='#produtos'">Ver Coleção</button>
             </div>
+        </header>
 
-            <div class="admin-card">
-                <h3>Promoção</h3>
-                <input type="number" id="promoPercent" placeholder="% Desconto Global">
-                <button onclick="applyGlobalPromo()">Aplicar Desconto</button>
-                
-                <div class="profit-badge" style="margin-top: 15px;">
-                    <span>Status de Promoção</span>
-                    <h2 id="active-promo-badge">Nenhuma</h2>
+        <section id="produtos">
+            <h2 class="title">Nossos Produtos</h2>
+            <div class="products" id="products-container"></div>
+        </section>
+
+        <section id="avaliacoes">
+            <h2 class="title">Avaliações de Clientes</h2>
+            <div id="escrever-avaliacao-container" style="margin-bottom: 30px;"></div>
+            <div class="reviews-container" id="reviews-list-container"></div>
+        </section>
+
+        <section id="feed">
+            <h2 class="title">@davila.store</h2>
+            <p style="margin-bottom: 30px; color: #888;">Siga nossa jornada no Instagram e marque a gente nos seus looks!</p>
+            <div class="carousel-wrapper">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide"><img src="img/feed1.png" alt="Look 1" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed2.png" alt="Look 2" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed3.png" alt="Look 3" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed4.png" alt="Look 4" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed5.png" alt="Look 5" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed6.png" alt="Look 6" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed7.png" alt="Look 7" onerror="this.src='img/feed.png'"></div>
+                    <div class="carousel-slide"><img src="img/feed8.png" alt="Look 8" onerror="this.src='img/feed.png'"></div>
                 </div>
             </div>
+        </section>
+    </div>
 
-            <div class="admin-card">
-                <h3>Finaceiro (Ganhos)</h3>
-                <div class="profit-badge" style="padding: 30px 20px; background: #161616;">
-                    <span style="color: #aaa; font-size: 14px; font-weight: 600;">Vendas Totais</span>
-                    <h2 id="total-profit" style="font-size: 36px; margin-top: 10px; color: #fff;">R$ 0.00</h2>
+    <div id="panel-view" style="display:none;">
+        <div class="panel-page-container">
+            <div class="admin-header">
+                <div>
+                    <h2 class="title" style="margin-bottom: 5px;">Ambiente Interno Corporativo</h2>
+                    <p style="color:#aaa;" id="user-logged-panel-name">Olá, Usuário</p>
                 </div>
+                <button class="logout-btn" onclick="logoutPainel()">Voltar para a Loja</button>
             </div>
 
-            <div class="admin-card" style="grid-column: span 2;">
-                <h3>Relatório de Vendas</h3>
-                <canvas id="salesChart" style="max-height: 220px; width: 100%;"></canvas>
-            </div>
+            <div class="panel-tabs" id="panelTabsContainer"></div>
 
-            <div class="admin-card" style="grid-column: span 2;">
-                <h3>📊 Controle de Estoque</h3>
-                <div class="stock-container-grid">
-                    <div class="stock-box-inner">
-                        <h4>Registrar Entrada</h4>
-                        <select id="stockProductSelect"></select>
-                        <input type="number" id="stockQuantityInput" placeholder="Quantidade a Adicionar">
-                        <button onclick="addStock()">Atualizar Estoque</button>
+            <div id="tab-conteudo-admin" class="panel-section">
+                <div class="admin-grid">
+                    
+                    <div class="admin-card">
+                        <h3>Gerenciar Produtos</h3>
+                        <input type="text" id="newProdName" placeholder="Nome do Produto (inclua a cor)">
+                        <input type="number" id="newProdPrice" placeholder="Preço" step="0.01">
+                        <input type="text" id="newProdImg" placeholder="Link da Imagem (Opcional)">
+                        <label class="field-label" style="display:block; margin: 10px 0 5px; font-size:12px; color:#aaa;">Tamanhos (separe por vírgula):</label>
+                        <input type="text" id="newProdSizes" placeholder="Ex: P, M, G, GG, XG">
+                        <button onclick="addNewProduct()">Adicionar Produto</button>
+                        <div class="admin-list" id="admin-product-list" style="margin-top: 15px;"></div>
                     </div>
-                    <div class="stock-box-inner">
-                        <h4>⚠️ Status / Baixo Estoque</h4>
-                        <div class="admin-list" id="low-stock-list"></div>
+
+                    <div class="admin-card">
+                        <h3>Equipe & Recursos Humanos</h3>
+                        <input type="text" id="workerName" placeholder="Nome">
+                        <select id="workerRole" style="width:100% !important; padding:12px; margin-bottom:12px; background:#000; border:1px solid #333; color:white; border-radius:8px;">
+                            <option value="Funcionário">Funcionário (Operações)</option>
+                            <option value="Supervisor">Supervisor</option>
+                            <option value="Gerente">Gerente</option>
+                        </select>
+                        <input type="email" id="workerEmail" placeholder="E-mail de Login">
+                        <input type="password" id="workerPassword" placeholder="Senha Provisória">
+                        <button onclick="addStaff()">Cadastrar Membro</button>
+                        <div class="admin-list" id="staff-list" style="margin-top: 15px;"></div>
                     </div>
+
+                    <div class="admin-card">
+                        <h3>Promoção Global</h3>
+                        <input type="number" id="promoPercent" placeholder="% Desconto Global">
+                        <button onclick="applyGlobalPromo()">Aplicar Desconto</button>
+                        <div class="profit-badge" style="margin: 15px 0; padding: 10px;">
+                            <span>Status de Promoção Global</span>
+                            <h2 id="active-promo-badge" style="font-size: 20px;">Nenhuma</h2>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #222; margin: 20px 0;">
+
+                        <h3>🏷️ Promoção Produto Único</h3>
+                        <select id="singlePromoProductSelect"></select>
+                        <input type="number" id="singlePromoPercent" placeholder="% Desconto do Produto">
+                        
+                        <label class="field-label" style="display:block; margin: 5px 0; font-size:11px; color:#ff4444;">Autenticação do Gerente Obrigatória:</label>
+                        <input type="email" id="managerPromoEmail" placeholder="E-mail do Gerente">
+                        <input type="password" id="managerPromoPassword" placeholder="Senha do Gerente">
+                        
+                        <button onclick="applySingleProductPromo()" style="background: #00ff88; color: #000;">Anunciar Desconto Único</button>
+                    </div>
+
+                    <div class="admin-card" style="grid-column: span 3;">
+                        <h3>📊 Relatórios Gerenciais Completos</h3>
+                        <div class="report-grid-box">
+                            <div>
+                                <h4>Vendas Mensais & Pedidos Totais</h4>
+                                <div class="report-list-text" id="adm-report-vendas-text">Nenhum registro ainda.</div>
+                                <button class="checkout-btn download-btn" onclick="downloadRelatorioPDF('vendas')">📄 Baixar Relatório de Vendas (PDF)</button>
+                            </div>
+                            <div>
+                                <h4>Formas de Pagamento Escolhidas</h4>
+                                <div class="report-list-text" id="adm-report-pagamentos-text">Nenhum registro ainda.</div>
+                                <button class="checkout-btn download-btn" onclick="downloadRelatorioPDF('pagamentos')">📄 Baixar Métodos de Pagamento (PDF)</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-card" style="grid-column: span 3;">
+                        <h3>📊 Gráfico Analítico de Vendas</h3>
+                        <canvas id="salesChart" style="max-height: 220px; width: 100%;"></canvas>
+                    </div>
+
+                    <div class="admin-card" style="grid-column: span 3;">
+                        <h3>📦 Registro de Entrada e Saída (Estoque)</h3>
+                        <div class="stock-three-columns">
+                            
+                            <div class="stock-column-box">
+                                <h4>Registrar Entrada manual</h4>
+                                <select id="stockProductSelect" style="margin-top: 10px;"></select>
+                                <input type="number" id="stockQuantityInput" placeholder="Quantidade a Adicionar">
+                                <button onclick="addStock()" class="checkout-btn" style="padding: 12px; font-size: 14px;">Atualizar Estoque</button>
+                            </div>
+
+                            <div class="stock-column-box">
+                                <h4>Visualização de Estoque Atual</h4>
+                                <div class="admin-list" id="adm-estoque-realtime-list" style="max-height: 180px; margin-top: 10px;"></div>
+                            </div>
+
+                            <div class="stock-column-box">
+                                <h4>Histórico de Movimentações (Entradas/Saídas)</h4>
+                                <div class="report-list-text" id="adm-report-estoque-text" style="max-height: 120px; margin-top: 10px;">Nenhum registro recente.</div>
+                                <button class="checkout-btn download-btn" onclick="downloadRelatorioPDF('estoque')" style="padding: 10px; font-size: 13px; width: 100%;">📄 Baixar Fluxo de Estoque (PDF)</button>
+                            </div>
+
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
+            <div id="tab-conteudo-funcionarios" class="panel-section">
+                <div class="admin-grid">
+                    <div class="admin-card" style="grid-column: span 2;">
+                        <h3>📋 Pedidos em Aberto (Separação para Entrega)</h3>
+                        <div class="admin-list" id="func-pedidos-separacao" style="max-height: 350px;"></div>
+                    </div>
+                    <div class="admin-card">
+                        <h3>🔍 Visualização Rápida de Estoque Atual</h3>
+                        <div class="admin-list" id="func-estoque-list" style="max-height: 350px;"></div>
+                    </div>
+                    <div class="admin-card" style="grid-column: span 3;">
+                        <h3>📉 Relatório Próprio de Vendas Mensais</h3>
+                        <div class="report-list-text" id="func-report-vendas-text" style="max-height: 200px;">Nenhum registro de venda realizada.</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
 
     <footer>
         <div class="footer-content">
@@ -184,8 +260,7 @@
     <div id="profileModal" class="modal">
         <div class="selection-box">
             <h2>Minha Conta</h2>
-            <div id="profile-pop-content">
-                </div>
+            <div id="profile-pop-content"></div>
             <button class="cancel-btn" onclick="closeProfileModal()">Fechar Janela</button>
         </div>
     </div>
@@ -194,24 +269,46 @@
         <div class="selection-box">
             <h2 id="modal-product-name">Produto</h2>
             <div class="label-modal">Escolha o tamanho ideal:</div>
-            <div class="options-grid" id="size-options">
-                </div>
+            <div class="options-grid" id="size-options"></div>
             <button class="checkout-btn" onclick="confirmAdd()">Adicionar ao Carrinho</button>
             <button class="cancel-btn" onclick="closePurchaseModal()">Voltar</button>
+        </div>
+    </div>
+
+    <div id="checkoutDetailsModal" class="modal">
+        <div class="selection-box" style="max-width: 500px; text-align: left;">
+            <h2>Finalizar Pedido</h2>
+            <p style="color:#888; margin-bottom: 15px;">Insira os dados finais para o envio seguro de suas mercadorias.</p>
+            
+            <div class="input-wrapper">
+                <label class="field-label">Endereço de Entrega Completo</label>
+                <input type="text" id="checkout-endereco" placeholder="Rua, Número, Bairro, Cidade">
+            </div>
+            
+            <div class="input-wrapper">
+                <label class="field-label">Forma de Pagamento</label>
+                <select id="checkout-pagamento">
+                    <option value="Pix">Pix (Aprovação Imediata)</option>
+                    <option value="Crédito">Cartão de Crédito</option>
+                    <option value="Débito">Cartão de Débito</option>
+                </select>
+            </div>
+            
+            <button class="checkout-btn" style="background:#00ff88; color:#000;" onclick="processarCompraFinal()">Confirmar e Pagar</button>
+            <button class="cancel-btn" onclick="document.getElementById('checkoutDetailsModal').classList.remove('active')">Voltar ao Carrinho</button>
         </div>
     </div>
 
     <div id="cart" class="side-panel">
         <button class="back-btn" onclick="openCart()">← Voltar à Loja</button>
         <h2>Seu Carrinho</h2>
-        <div class="panel-content-area" id="cart-items">
-            </div>
+        <div class="panel-content-area" id="cart-items"></div>
         <div class="total-box">
             <div class="price-row">
                 <span>Total:</span>
                 <span>R$ <span id="total">0.00</span></span>
             </div>
-            <button class="checkout-btn" onclick="alert('Pedido finalizado com sucesso!')">Finalizar Compra</button>
+            <button class="checkout-btn" onclick="abrirModalCheckoutDados()">Finalizar Compra</button>
         </div>
     </div>
 
