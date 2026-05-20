@@ -219,3 +219,11 @@ footer { background: #000; padding: 40px 8%; border-top: 1px solid #222; margin-
     .admin-card { grid-column: span 1 !important; padding: 15px !important; }
     .footer-content { flex-direction: column !important; gap: 20px !important; text-align: center !important; }
 }
+
+/* AJUSTE PERFEITO PARA AS FOTOS DO CARROSSEL */
+#carouselTrack img {
+    width: 100%;             /* Faz a foto se esticar na largura correta do bloco */
+    height: 400px;           /* Define uma altura fixa para o seu banner não sumir */
+    object-fit: cover;       /* REGRA DE OURO: Corta e encaixa a foto sem distorcer ou esticar */
+    object-position: center;  /* Mantém o meio da foto sempre visível */
+}
