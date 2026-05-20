@@ -11,7 +11,6 @@ function salvarBanco() {
 }
 
 function carregarBanco() {
-    // CORRIGIDO: Alterado de stringify para parse para carregar os produtos corretamente como Array
     if(localStorage.getItem("davila_produtos")) produtos = JSON.parse(localStorage.getItem("davila_produtos"));
     if(localStorage.getItem("davila_equipe")) equipe = JSON.parse(localStorage.getItem("davila_equipe"));
     if(localStorage.getItem("davila_usuarios")) usuariosCadastrados = JSON.parse(localStorage.getItem("davila_usuarios"));
@@ -27,6 +26,7 @@ let cart = [];
 let selectedProduct = null;
 let selSize = "";
 let currentDiscountPercent = 0;
+let salesChartInstance = null; // Guardará a instância do gráfico para permitir atualizações em tempo real
 
 // Dados Base Iniciais (Serão gravados se o banco estiver vazio)
 let usuariosCadastrados = [
@@ -38,7 +38,7 @@ let usuariosCadastrados = [
 let currentUser = { name: "", email: "", role: "", img: "img/avatar-cliente.png" };
 
 let produtos = [
-    { id: 1, name: "Jaqueta Varsity", price: 499.90, img: "img/produto.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 12, individualDiscount: 0 },
+    { id: 1, name: "Jaqueta Varsity", price: 359.90, img: "img/produto.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 12, individualDiscount: 0 },
     { id: 2, name: "Moletom Performance", price: 279.90, img: "img/moletom-liso.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0 },
     { id: 3, name: "Calça Moletom Performance", price: 299.90, img: "img/moletom.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0 },
     { id: 4, name: "Camiseta Essential Blue", price: 229.90, img: "img/camisa-azul.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 9, individualDiscount: 0 },
@@ -46,8 +46,8 @@ let produtos = [
     { id: 6, name: "Camiseta Essential Grey", price: 229.90, img: "img/camisa-cinza.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0  },  
     { id: 7, name: "Camiseta Essential White", price: 229.90, img: "img/camisa-branca.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 10, individualDiscount: 0  },
     { id: 8, name: "Shorts Performance", price: 149.90, img: "img/shorts.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 4, individualDiscount: 0  },
-    { id: 9, name: "Tênis Urban Fit", price: 359.90, img: "img/produtos.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0  },
-    { id: 10, name: "Boné Fit", price: 99.90, img: "img/bone.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0  }
+    { id: 9, name: "Tênis Urban Fit", price: 499.00, img: "img/produtos.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 8, individualDiscount: 0  },
+    { id: 10, name: "Boné Fit", price: 99.90, img: "img/bone.png", sizes: ["P", "M", "G", "GG", "XG"], stock: 5, individualDiscount: 0  }
 ];
 
 let equipe = [
@@ -174,10 +174,8 @@ function login() {
     let emailInput = document.getElementById("email").value.trim();
     let passwordInput = document.getElementById("password").value.trim();
 
-    // Procura primeiro na base geral de usuários cadastrados
     let usuarioEncontrado = usuariosCadastrados.find(user => user.email === emailInput && user.password === passwordInput);
 
-    // Se não achar, procura na lista de equipe cadastrada pelo gerenciador
     if(!usuarioEncontrado) {
         let membroEquipe = equipe.find(eq => eq.email === emailInput && eq.password === passwordInput);
         if(membroEquipe) {
@@ -185,7 +183,7 @@ function login() {
                 name: membroEquipe.name, 
                 email: membroEquipe.email, 
                 password: membroEquipe.password, 
-                role: membroEquipe.role, // Pega o cargo exato ("Gerente", "Funcionário", etc.)
+                role: membroEquipe.role, 
                 img: "img/avatar-cliente.png" 
             };
         }
@@ -194,7 +192,6 @@ function login() {
     if (usuarioEncontrado) {
         logged = true;
         
-        // Define as permissões com base estrita no cargo selecionado no cadastro
         isAdmin = (usuarioEncontrado.role === "Administrador" || usuarioEncontrado.role === "Gerente");
         isFuncionario = (usuarioEncontrado.role === "Funcionário" || usuarioEncontrado.role === "Supervisor");
 
@@ -213,7 +210,6 @@ function login() {
         updateNavigation();
         verificarFormularioAvaliacao();
         
-        // Se pertencer à equipe, redireciona para o painel correspondente ao nível de acesso
         if(isAdmin || isFuncionario) {
             abrirModoPainelSeparado();
         }
@@ -233,7 +229,6 @@ function abrirModoPainelSeparado() {
     const tabsContainer = document.getElementById("panelTabsContainer");
     tabsContainer.innerHTML = "";
 
-    // Condicional que monta as guias e exibe as informações conforme a regra do cargo cadastrado
     if (currentUser.role === "Administrador" || currentUser.role === "Gerente") {
         tabsContainer.innerHTML = `<button class="tab-btn active" onclick="switchTab('admin')">Painel Geral Gerência / Administração</button>`;
         switchTab('admin');
@@ -244,7 +239,6 @@ function abrirModoPainelSeparado() {
     
     atualizarRelatoriosELists();
 }
-
 
 function switchTab(target) {
     document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
@@ -257,9 +251,116 @@ function logoutPainel() {
     document.getElementById("site-view").style.display = "block";
 }
 
+// =================================================================
+// SISTEMA DE DUAS ETAPAS COM ENDEREÇO SEPARADO POR CAMPOS
+// =================================================================
 function abrirModalCheckoutDados() {
     if (cart.length === 0) return alert("Seu carrinho está vazio!");
-    document.getElementById("checkoutDetailsModal").classList.add("active");
+    
+    document.getElementById("cart").classList.remove("active");
+    
+    const modal = document.getElementById("checkoutDetailsModal");
+    modal.classList.add("active");
+
+    const inputEnderecoOriginal = document.getElementById("checkout-endereco");
+    const selectPagamento = document.getElementById("checkout-pagamento");
+    
+    if (inputEnderecoOriginal && selectPagamento) {
+        const containerEnderecoOriginal = inputEnderecoOriginal.parentElement;
+        const containerPagamento = selectPagamento.parentElement;
+        
+        containerEnderecoOriginal.style.display = "none";
+        containerPagamento.style.display = "none";
+        
+        const blocoSeparadoAntigo = modal.querySelector(".endereco-separado-block");
+        if(blocoSeparadoAntigo) blocoSeparadoAntigo.remove();
+        const navAntigo = modal.querySelector(".checkout-nav-step-btns");
+        if(navAntigo) navAntigo.remove();
+
+        let blocoSeparado = document.createElement("div");
+        blocoSeparado.className = "endereco-separado-block";
+        blocoSeparado.style.display = "block";
+        blocoSeparado.style.textAlign = "left";
+
+        blocoSeparado.innerHTML = `
+            <div style="margin-bottom: 12px;">
+                <label class="field-label" style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Rua / Logradouro</label>
+                <input type="text" id="chk-rua" placeholder="Ex: Av. Paulista" style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:8px;">
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom: 12px;">
+                <div style="flex: 1;">
+                    <label class="field-label" style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Número</label>
+                    <input type="text" id="chk-numero" placeholder="Ex: 123" style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:8px;">
+                </div>
+                <div style="flex: 2;">
+                    <label class="field-label" style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Bairro</label>
+                    <input type="text" id="chk-bairro" placeholder="Ex: Centro" style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:8px;">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label class="field-label" style="display:block; margin-bottom:5px; font-size:13px; color:#888;">Cidade</label>
+                <input type="text" id="chk-cidade" placeholder="Ex: São Paulo" style="width:100%; padding:12px; background:#000; border:1px solid #333; color:white; border-radius:8px;">
+            </div>
+        `;
+
+        containerPagamento.parentNode.insertBefore(blocoSeparado, containerPagamento);
+
+        let btnFinalizar = modal.querySelector("button[onclick='processarCompraFinal()']");
+        if (btnFinalizar) {
+            btnFinalizar.style.display = "none"; 
+
+            let navBox = document.createElement("div");
+            navBox.className = "checkout-nav-step-btns";
+            navBox.style.display = "flex";
+            navBox.style.gap = "10px";
+            navBox.style.marginTop = "15px";
+
+            let btnAvancar = document.createElement("button");
+            btnAvancar.innerText = "Avançar para Pagamento ➔";
+            btnAvancar.className = "checkout-btn";
+            btnAvancar.style.background = "#2f6fff";
+            btnAvancar.style.color = "#fff";
+            btnAvancar.style.width = "100%";
+
+            let btnVoltar = document.createElement("button");
+            btnVoltar.innerText = "⬅ Voltar";
+            btnVoltar.className = "checkout-btn";
+            btnVoltar.style.background = "#333";
+            btnVoltar.style.color = "#fff";
+            btnVoltar.style.display = "none";
+
+            btnAvancar.onclick = function() {
+                let rua = document.getElementById("chk-rua").value.trim();
+                let num = document.getElementById("chk-numero").value.trim();
+                let bairro = document.getElementById("chk-bairro").value.trim();
+                let cidade = document.getElementById("chk-cidade").value.trim();
+
+                if(!rua || !num || !bairro || !cidade) {
+                    return alert("Por favor, preencha todos os campos da entrega (Rua, Número, Bairro e Cidade)!");
+                }
+
+                inputEnderecoOriginal.value = `${rua}, Nº ${num} - Bairro: ${bairro} - ${cidade}`;
+
+                blocoSeparado.style.display = "none";
+                containerPagamento.style.display = "block";
+                btnVoltar.style.display = "block";
+                btnAvancar.style.display = "none";
+                btnFinalizar.style.display = "block"; 
+            };
+
+            btnVoltar.onclick = function() {
+                blocoSeparado.style.display = "block";
+                containerPagamento.style.display = "none";
+                btnVoltar.style.display = "none";
+                btnAvancar.style.display = "block";
+                btnFinalizar.style.display = "none";
+            };
+
+            navBox.appendChild(btnVoltar);
+            navBox.appendChild(btnAvancar);
+            btnFinalizar.parentNode.insertBefore(navBox, btnFinalizar);
+        }
+    }
 }
 
 function processarCompraFinal() {
@@ -276,6 +377,10 @@ function processarCompraFinal() {
 
     let codPedido = Math.floor(1000 + Math.random() * 9000);
 
+    // Mapeamento para identificar o dia da semana atual da venda
+    const diasSemanaMap = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+    let diaDaSemanaAtual = diasSemanaMap[new Date().getDay()];
+
     let novoPedido = {
         id: codPedido,
         cliente: currentUser.name,
@@ -284,7 +389,8 @@ function processarCompraFinal() {
         endereco: endereco,
         formaPagamento: pagamento,
         status: "Aguardando Separação",
-        data: new Date().toLocaleDateString()
+        data: new Date().toLocaleDateString(),
+        diaSemana: diaDaSemanaAtual // Gravamos o dia da semana para leitura estruturada do gráfico
     };
 
     pedidosGerais.push(novoPedido);
@@ -297,9 +403,14 @@ function processarCompraFinal() {
     updateCartUI();
     document.getElementById("checkout-endereco").value = "";
     document.getElementById("checkoutDetailsModal").classList.remove("active");
-    document.getElementById("cart").classList.remove("active");
+    
+    const blocoSeparadoAntigo = document.querySelector(".endereco-separado-block");
+    if(blocoSeparadoAntigo) blocoSeparadoAntigo.remove();
+    const navAntigo = document.querySelector(".checkout-nav-step-btns");
+    if(navAntigo) navAntigo.remove();
     
     atualizarRelatoriosELists();
+    initChart(); // Atualiza os dados visuais do gráfico dinamicamente com a nova venda
 }
 
 function atualizarRelatoriosELists() {
@@ -419,13 +530,12 @@ function downloadRelatorioPDF(tipo) {
     doc.save(`relatorio-${tipo}-${Date.now()}.pdf`);
 }
 
-// Geração da Etiqueta de Envio/Ficha de Separação para o Funcionário colocar no pacote
 function baixarFichaSeparacaoPDF(index) {
     const pedido = pedidosGerais[index];
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    doc.rect(10, 10, 190, 120); // Desenha uma borda simulando a etiqueta física
+    doc.rect(10, 10, 190, 120); 
     
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(16);
@@ -475,7 +585,6 @@ function addStaff() {
         document.getElementById("workerPassword").value="";
         alert(`Membro ${n} (${r}) cadastrado com sucesso!`);
         
-        // ADICIONADO: Atualiza em tempo real as listas após o cadastro de um funcionário
         atualizarRelatoriosELists();
     } else {
         alert("Preencha todos os dados do funcionário para login.");
@@ -627,6 +736,7 @@ function removeFromCart(cartId) {
         updateCartUI();
         renderProducts();
         atualizarRelatoriosELists();
+        initChart(); // Recalcula o gráfico caso um item seja removido/estornado
     }
 }
 function moveProductUp(index) { if (index === 0) return; let temp = produtos[index]; produtos[index] = produtos[index - 1]; produtos[index - 1] = temp; salvarBanco(); renderProducts(); }
@@ -675,7 +785,7 @@ function renderProducts() {
     const singleSelect = document.getElementById("singlePromoProductSelect");
     if(singleSelect) {
         singleSelect.innerHTML = "";
-        produtos.forEach(p => { singleSelect.innerHTML += `<option value="${p.id}">${p.name} (R$ ${p.price.toFixed(2)})</option>`; });
+        produtos.forEach(p => { select.innerHTML += `<option value="${p.id}">${p.name} (R$ ${p.price.toFixed(2)})</option>`; });
     }
     
     atualizarRelatoriosELists();
@@ -714,11 +824,101 @@ function renderStaff() {
         </div>`;
     });
 }
+
+// ==========================================
+// SISTEMA GRÁFICO TOTALMENTE DINÂMICO
+// ==========================================
 function initChart() {
-    const ctx = document.getElementById('salesChart'); if(!ctx) return;
-    new Chart(ctx.getContext('2d'), {
+    const ctx = document.getElementById('salesChart'); 
+    if(!ctx) return;
+
+    // Estruturas base vazias para receber o somatório por dia da semana
+    const diasSemanaLabels = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+    const faturamentoPorDia = [0, 0, 0, 0, 0, 0, 0];
+    const qtdVendasPorDia = [0, 0, 0, 0, 0, 0, 0];
+
+    // Varre o banco de relatorioVendas e popula os dias correspondentes
+    relatorioVendas.forEach(venda => {
+        let labelDia = venda.diaSemana || "Seg"; // Fallback caso vendas antigas não possuam a tag
+        let indexDia = diasSemanaLabels.indexOf(labelDia);
+        if(indexDia !== -1) {
+            faturamentoPorDia[indexDia] += venda.total;
+            qtdVendasPorDia[indexDia] += 1;
+        }
+    });
+
+    // Se um gráfico já existia na tela, nós destruímos ele para renderizar as novas linhas de dados limpas
+    if (salesChartInstance) {
+        salesChartInstance.destroy();
+    }
+
+    salesChartInstance = new Chart(ctx.getContext('2d'), {
         type: 'line',
-        data: { labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], datasets: [{ label: 'Vendas (R$)', data: [500, 1200, 800, 1500, 2100], borderColor: '#2f6fff', tension: 0.4 }] },
-        options: { plugins: { legend: { labels: { color: '#fff' } } } }
+        data: { 
+            labels: diasSemanaLabels, 
+            datasets: [
+                { 
+                    label: 'Ganhos Totais (R$)', 
+                    data: faturamentoPorDia, 
+                    borderColor: '#00ff88', // Linha verde para dinheiro/ganhos
+                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y'
+                },
+                { 
+                    label: 'Quantidade de Vendas', 
+                    data: qtdVendasPorDia, 
+                    borderColor: '#2f6fff', // Linha azul para volume de pedidos
+                    backgroundColor: 'rgba(47, 111, 255, 0.1)',
+                    tension: 0.4,
+                    yAxisID: 'y1',
+                    borderDash: [5, 5] // Estilo tracejado para diferenciar visualmente
+                }
+            ] 
+        },
+        options: { 
+            responsive: true,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: 'Faturamento (R$)', color: '#fff' },
+                    ticks: { color: '#fff' },
+                    grid: { color: '#222' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: 'Volume de Pedidos', color: '#fff' },
+                    ticks: { color: '#fff', stepSize: 1 },
+                    grid: { drawOnChartArea: false } // Não mistura as grades de fundo
+                },
+                x: {
+                    ticks: { color: '#fff' },
+                    grid: { color: '#222' }
+                }
+            },
+            plugins: { 
+                legend: { 
+                    labels: { color: '#fff', font: { weight: 'bold' } } 
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) { label += ': '; }
+                            if (context.datasetIndex === 0) {
+                                label += 'R$ ' + context.parsed.y.toFixed(2);
+                            } else {
+                                label += context.parsed.y + ' un';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            } 
+        }
     });
 }
